@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # like_count_with_ajax_csrf
 Build a basic like count button for social media post with ajax and csrf
 =======
@@ -25,6 +24,7 @@ This project is designed as a learning tool for understanding the integration of
 _Here's what the final UI looks like:_
 
 ![Modern Post Feed UI](https://drive.google.com/file/d/1SzF-TRF1-JmzmuA_xreM1dLdzUvVgO4U/view?usp=drive_link)
+![Demo](WebPage.png)
 
 ---
 
@@ -48,4 +48,3 @@ Make sure you have Python 3 and pip installed on your system.
 ```bash
 # Example for Arch Linux
 sudo pacman -Syu python python-pip
->>>>>>> debdcc5 (Initial project upload)
