@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <title>Modern Post Feed</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #f0f2f5;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .feed-container {
+            max-width: 500px; /* A good width for a feed */
+            margin: 0 auto;
+        }
+
+        .post-card {
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            margin-bottom: 25px; /* Space between cards */
+            padding: 20px 25px;
+            overflow: hidden; /* Ensures padding and borders behave */
+        }
+
+        /* Author and Avatar Section */
+        .post-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            margin-right: 15px;
+            object-fit: cover;
+        }
+
+        .author {
+            font-weight: 600;
+            font-size: 18px;
+            color: #1c1e21;
+        }
+
+        /* Post Description */
+        .description {
+            font-size: 16px;
+            line-height: 1.5;
+            color: #333;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #e9ebee; /* A subtle separator line */
+            padding-bottom: 20px;
+        }
+
+        /* Likes and Button Section */
+        .post-actions {
+            display: flex;
+            justify-content: space-between; /* Pushes items to opposite ends */
+            align-items: center;
+        }
+        
+        .likes-info {
+            font-size: 16px;
+            color: #555;
+        }
+
+        .like-count {
+            font-size: 28px;
+            font-weight: 700;
+            color: #e91e63;
+            display: block; /* Makes it sit on its own line */
+        }
+        
+        .like-button {
+            display: inline-flex;
+            align-items: center;
+            padding: 10px 22px;
+            font-size: 16px;
+            font-weight: 600;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            color: #ffffff;
+            background: linear-gradient(to right, #ff5f6d, #ffc371);
+            box-shadow: 0 4px 8px rgba(255, 95, 109, 0.4);
+            transition: transform 0.2s ease;
+            gap: 8px;
+        }
+
+        .like-button:hover {
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body>
+
+    <main class="feed-container">
+        
+        {% for post in posts %}
+        <article class="post-card" id="post-{{ post.id }}">
+
+            <header class="post-header">
+                <img src="{{ post.avatar }}" alt="{{ post.author }}'s avatar" class="avatar">
+                <h2 class="author">{{ post.author }}</h2>
+            </header>
+            
+            <div class="description">
+                <p>{{ post.description }}</p>
+            </div>
+            
+            <footer class="post-actions">
+                <div class="likes-info">
+                    Likes:
+                    <span class="like-count" id="like-count-{{ post.id }}">{{ post.likes }}</span>
+                </div>
+                <button class="like-button" data-post-id="{{ post.id }}">❤️ Like</button>
+            </footer>
+
+        </article>
+        {% endfor %}
+
+    </main>
+
+    <script>
+        // This JavaScript is the efficient one for handling multiple posts
+        document.addEventListener('DOMContentLoaded', function() {
+            const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+            
+            document.querySelector('.feed-container').addEventListener('click', function(event) {
+                // Find the closest button if the click was inside it (e.g., on the heart)
+                const button = event.target.closest('.like-button');
+                
+                if (button) {
+                    const postId = button.dataset.postId;
+                    const likeCountSpan = document.getElementById('like-count-' + postId);
+                    
+                    fetch(`/like/${postId}`, {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRFToken': csrfToken,
+                            'Content-Type': 'application/json'
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if(data.likes !== undefined) {
+                            likeCountSpan.textContent = data.likes;
+                        }
+                    })
+                    .catch(error => console.error('Error:', error));
+                }
+            });
+        });
+    </script>
+
+</body>
+</html>
